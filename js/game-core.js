@@ -120,7 +120,7 @@ function selectCard(index) {
     renderCards();
     updateCardButtonsLock();
 
-    setTimeout(() => botTurn(), 1500);
+    setTimeout(() => botTurn(), 1700);
 }
 
 /* ----------------------------------------
@@ -154,7 +154,7 @@ function botTurn() {
 
         setTimeout(() => {
             resolveVolatilityCard(remaining[0]);
-        }, 1500);
+        }, 1700);
 
     } else {
         endTurn();
@@ -167,11 +167,29 @@ function botTurn() {
 
 function resolveVolatilityCard(card) {
 
+    // 1) แสดงการ์ดผันผวน
     showEvent("⚡ การ์ดความผันผวน\n" + card.join(" "));
 
-    applyVolatility(card);
+    setTimeout(() => {
 
-    setTimeout(() => endTurn(), 1500);
+        // 2) อัปเดตตลาด + รับผลตลาดแตก
+        const broken = applyVolatility(card);
+
+        setTimeout(() => {
+
+            // 3) ถ้ามีตลาดแตก
+            if (broken.length > 0) {
+                showEvent("💥 ตลาดแตก!\n" + broken.join(" "));
+            }
+
+            // 4) ไปเทิร์นต่อ
+            setTimeout(() => {
+                endTurn();
+            }, 800);
+
+        }, 800);
+
+    }, 800);
 }
 
 /* ----------------------------------------
@@ -180,46 +198,42 @@ function resolveVolatilityCard(card) {
 
 function applyVolatility(card) {
 
-    // 📍 STEP 1: โชว์การ์ดผันผวนก่อน
-    showEvent("⚡ การ์ดความผันผวน\n" + card.join(" "));
+    // 📌 1. เปลี่ยนตลาด (ล้วน ๆ ไม่มีเวลา)
+    card.forEach(e => {
 
-    setTimeout(() => {
+        if (e === "🥦") market.broccoli++;
+        if (e === "🌽") market.corn++;
+        if (e === "🥕") market.carrot++;
+        if (e === "🍅") market.tomato++;
+        if (e === "🍆") market.eggplant++;
 
-        // 📍 STEP 2: อัปเดตตลาด
-        card.forEach(e => {
+    });
 
-            if (e === "🥦") market.broccoli++;
-            if (e === "🌽") market.corn++;
-            if (e === "🥕") market.carrot++;
-            if (e === "🍅") market.tomato++;
-            if (e === "🍆") market.eggplant++;
+    // 📌 2. เช็คตลาดแตก
+    const broken = [];
 
-        });
+    Object.keys(market).forEach(key => {
 
-        // 📍 STEP 3: เช็คตลาดแตก + ใช้ emoji
-        Object.keys(market).forEach(key => {
+        if (market[key] >= 5) {
 
-            if (market[key] >= 5) {
+            const emojiMap = {
+                broccoli: "🥦",
+                corn: "🌽",
+                carrot: "🥕",
+                tomato: "🍅",
+                eggplant: "🍆"
+            };
 
-                const emojiMap = {
-                    broccoli: "🥦",
-                    corn: "🌽",
-                    carrot: "🥕",
-                    tomato: "🍅",
-                    eggplant: "🍆"
-                };
+            broken.push(emojiMap[key]);
 
-                showEvent("💥 ตลาดแตก!\n    " + emoji);
+            market[key] = 0;
+        }
+    });
 
-                market[key] = 0;
-            }
+    renderMarket();
 
-        });
-
-        // 📍 STEP 4: render ตลาด
-        renderMarket();
-
-    }, 1500);
+    // 📌 ส่งผลลัพธ์กลับไปให้ flow คุม
+    return broken;
 }
 /* ----------------------------------------
    หมดเวลา
@@ -234,7 +248,7 @@ if (gameHour >= 18) {
     gameHour = 18;
     gameOver = true;
 
-    showEvent("⛔ ตลาดปิด\nเทรดวันนี้จบแล้ว");
+    showEvent("⛔ตลาดปิด⛔\nเทรดวันนี้จบแล้ว");
 
     setTimeout(() => {
 
@@ -243,7 +257,7 @@ if (gameHour >= 18) {
 
         showEndGame(playerScore, botScore);
 
-    }, 1500);
+    }, 3000);
 }
 
 /* ----------------------------------------
@@ -254,8 +268,16 @@ function calculateScore(inv) {
 
     let score = 0;
 
+    const priceMap = {
+        broccoli: 1,
+        corn: 1,
+        carrot: 1,
+        tomato: 1,
+        eggplant: 1
+    };
+
     Object.keys(inv).forEach(key => {
-        score += inv[key] * (market[key] || 0);
+        score += inv[key] * priceMap[key];
     });
 
     return score;
@@ -297,9 +319,9 @@ function endTurn() {
         renderCards();
         updateCardButtonsLock();
 
-        showEvent("🔄 เริ่มตาถัดไป");
+        showEvent("🔄 เปิดรอบใหม่\n📈 หุ้นใหม่เข้าตลาดแล้ว");
 
-    }, 1500);
+    }, 2500);
 }
 
 /* ----------------------------------------

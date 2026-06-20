@@ -112,7 +112,7 @@ function selectCard(index) {
     addCardToPlayer(card);
     updateInventoryUI();
 
-    showEvent("👤 : " + card.join(" "));
+  showEvent("👤 : เลือก\n" + card.join(" "));
 
     currentCards[index] = null;
     playerHasChosen = true;
@@ -146,7 +146,7 @@ function botTurn() {
 
     updateInventoryUI();
 
-    showEvent("🤖 : " + card.join(" "));
+    showEvent("🤖 : เลือก\n" + card.join(" "));
 
     const remaining = currentCards.filter(c => c);
 
@@ -209,7 +209,7 @@ function applyVolatility(card) {
                     eggplant: "🍆"
                 };
 
-                showEvent("💥 ตลาดแตก! " + emojiMap[key]);
+                showEvent("💥 ตลาดแตก!\n    " + emoji);
 
                 market[key] = 0;
             }

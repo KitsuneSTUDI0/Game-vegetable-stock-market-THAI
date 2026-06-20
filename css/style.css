@@ -89,13 +89,23 @@ body{
 ========================= */
 
 .event-box{
-    min-height:110px;
+    min-height: 110px;
+    max-height: 110px;   /* 👈 ล็อกไว้เลย */
+    overflow: hidden;    /* 👈 กันข้อความดันกล่อง */
 }
 
 #eventLog{
-    white-space:pre-line;
-    line-height:1.6;
-    text-align:center;
+    white-space: pre-line;
+    text-align: center;
+
+    font-size: 1.6rem;  /* 👈 เพิ่มตรงนี้ */
+    font-weight: bold;  /* (optional) ให้เด่นขึ้น */
+    line-height: 1.6;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
 }
 
 /* =========================
@@ -173,7 +183,10 @@ body{
     z-index:100;
 }
 
-.modal-content{
+
+    .modal-content{
+    text-align: center;
+
     width:90%;
     max-width:450px;
 

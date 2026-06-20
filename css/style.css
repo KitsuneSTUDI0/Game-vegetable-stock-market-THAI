@@ -95,12 +95,18 @@ body{
 }
 
 #eventLog{
-    white-space: pre-line;
+    white-space: pre-line;   /* ทำให้ \n ขึ้นบรรทัดใหม่ */
     text-align: center;
 
-    font-size: 1.6rem;
     font-weight: bold;
-    line-height: 1.6;
+    line-height: 1.4;
+
+    /* 📱 สำคัญมาก: auto resize */
+    font-size: clamp(1rem, 4vw, 1.6rem);
+
+    /* กันข้อความล้นมือถือ */
+    word-break: break-word;
+    overflow-wrap: break-word;
 }
 
 /* =========================

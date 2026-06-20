@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sproutfolio 👑 Alpha Test 0.0.1</title>
+
+```
+<!-- CSS -->
+<link rel="stylesheet" href="css/style.css">
+```
+
+</head>
+<body>
+
+```
+<!-- =========================
+     หน้าหลักเกม
+========================== -->
+<main class="game-container">
+
+    <!-- สภาพอากาศ -->
+    <section class="weather-box">
+        <span id="weatherText">🌤️ : อากาศดี</span>
+    </section>
+
+    <!-- เวลา -->
+    <section class="time-box">
+        <span id="timeText">01:00 PM</span>
+    </section>
+
+    <!-- ตลาดหุ้น -->
+    <section class="market-box">
+
+        <h2>📈 ตลาดหุ้นวันนี้</h2>
+
+        <div id="marketList">
+
+            <div class="market-row">
+                <span class="veg">🥦</span>
+                <span id="stock-broccoli">❌</span>
+            </div>
+
+            <div class="market-row">
+                <span class="veg">🌽</span>
+                <span id="stock-corn">❌</span>
+            </div>
+
+            <div class="market-row">
+                <span class="veg">🥕</span>
+                <span id="stock-carrot">❌</span>
+            </div>
+
+            <div class="market-row">
+                <span class="veg">🍅</span>
+                <span id="stock-tomato">❌</span>
+            </div>
+
+            <div class="market-row">
+                <span class="veg">🍆</span>
+                <span id="stock-eggplant">❌</span>
+            </div>
+
+        </div>
+
+    </section>
+
+    <!-- กล่องข้อความเหตุการณ์ -->
+    <section class="event-box">
+
+        <div id="eventLog">
+            👤 กำลังเลือกการ์ด...
+        </div>
+
+    </section>
+
+    <!-- การ์ด 3 ใบ -->
+    <section class="cards-container">
+
+        <button class="card" id="card1">
+            🥦 🥦 🌽
+        </button>
+
+        <button class="card" id="card2">
+            🥕 🍅 🌽
+        </button>
+
+        <button class="card" id="card3">
+            🍆 🍆 🍆
+        </button>
+
+    </section>
+
+</main>
+
+<!-- =========================
+     ปุ่มเปิดคลัง
+========================== -->
+<button id="inventoryBtn" class="inventory-btn">
+    📦
+</button>
+
+<!-- =========================
+     Popup คลัง
+========================== -->
+<div id="inventoryModal" class="modal hidden">
+
+    <div class="modal-content">
+
+        <h2>📦 คลังเก็บผัก 📦</h2>
+
+        <div class="inventory-grid">
+
+            <!-- ผู้เล่น -->
+            <div>
+
+                <h3>👤</h3>
+
+                <p>🥦 : <span id="player-broccoli">0</span></p>
+                <p>🌽 : <span id="player-corn">0</span></p>
+                <p>🥕 : <span id="player-carrot">0</span></p>
+                <p>🍅 : <span id="player-tomato">0</span></p>
+                <p>🍆 : <span id="player-eggplant">0</span></p>
+
+            </div>
+
+            <!-- บอท -->
+            <div>
+
+                <h3>🤖</h3>
+
+                <p>🥦 : <span id="bot-broccoli">0</span></p>
+                <p>🌽 : <span id="bot-corn">0</span></p>
+                <p>🥕 : <span id="bot-carrot">0</span></p>
+                <p>🍅 : <span id="bot-tomato">0</span></p>
+                <p>🍆 : <span id="bot-eggplant">0</span></p>
+
+            </div>
+
+        </div>
+
+        <button id="closeInventory">
+            ปิดคลัง
+        </button>
+
+    </div>
+
+</div>
+
+
+
+<!-- =========================
+     หน้าจบเกม (NEW PAGE)
+========================== -->
+<div id="endGameScreen" class="end-screen hidden">
+
+    <div class="end-content">
+
+        <h1 id="endTitle">🎉 ยินดีด้วย 🎉</h1>
+
+        <p id="endMessage"></p>
+
+        <div class="score-box">
+            <p id="endPlayerScore"></p>
+            <p id="endBotScore"></p>
+        </div>
+
+        <button id="restartBtn">เริ่มใหม่</button>
+
+    </div>
+
+</div>
+
+<!-- =========================
+     JavaScript
+========================== -->
+<script src="data/vegetables.js"></script>
+
+<script src="js/market-system.js"></script>
+
+<script src="js/ui.js"></script>
+
+<script src="js/save-system.js"></script>
+
+<script src="js/game-core.js"></script>
+```
+
+</body>
+</html>

@@ -3,13 +3,6 @@
    style.css
 ======================================== */
 
-html, body {
-    height: 100%;
-    margin: 0;
-    padding: 0;
-
-    overflow: hidden;  /* 👈 สำคัญมาก ห้าม scroll ทั้งหน้า */
-}
 /* รีเซ็ตพื้นฐาน */
 
 *{
@@ -29,13 +22,12 @@ body{
    โครงหลัก
 ========================= */
 
-.game-container {
-    height: 100vh;   /* 👈 เต็มหน้าจอ */
-    width: 100vw;
-
-    display: flex;
-    flex-direction: column;
+.game-container{
+    max-width:600px;
+    margin:0 auto;
+    padding:16px;
 }
+
 /* =========================
    กล่องทั่วไป
 ========================= */
@@ -96,28 +88,25 @@ body{
    กล่องข้อความ
 ========================= */
 
-.event-box {
-    flex: 1; /* 👈 ให้กินพื้นที่กลางจอ */
-
-    display: flex;
-    justify-content: center;
-    align-items: center;
+.event-box{
+    min-height: 110px;
+    max-height: 110px;   /* 👈 ล็อกไว้เลย */
+    overflow: hidden;    /* 👈 กันข้อความดันกล่อง */
 }
-#eventLog {
+
+#eventLog{
+    white-space: pre-line;   /* ทำให้ \n ขึ้นบรรทัดใหม่ */
     text-align: center;
 
     font-weight: bold;
     line-height: 1.4;
 
-    /* 📱 auto resize */
-    font-size: clamp(1rem, 3.2vw, 1.5rem);
+    /* 📱 สำคัญมาก: auto resize */
+    font-size: clamp(1rem, 4vw, 1.6rem);
 
     /* กันข้อความล้นมือถือ */
-    white-space: pre-line;
     word-break: break-word;
     overflow-wrap: break-word;
-
-    max-width: 90%;
 }
 
 /* =========================

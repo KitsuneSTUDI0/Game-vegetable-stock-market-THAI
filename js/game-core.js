@@ -1,14 +1,17 @@
 /* ========================================
    Sproutfolio 👑 Alpha Test 0.0.1
-   game-core.js (FULL FIXED VERSION)
+   game-core.js (6 TURNS FIXED SAFE FINAL)
 ======================================== */
 
 let currentCards = [];
 let playerHasChosen = false;
 let gameLocked = false;
 
-let gameHour = 13; // ⏰ เริ่ม 01:00 PM
+let gameHour = 13;
 let gameOver = false;
+
+/* 🟢 ตัวนับตา */
+let turnCount = 0;
 
 /* ----------------------------------------
    คลังผู้เล่น
@@ -30,6 +33,8 @@ const botInventory = {
     eggplant: 0
 };
 
+
+
 /* ----------------------------------------
    สุ่มผัก
 ---------------------------------------- */
@@ -37,10 +42,6 @@ const botInventory = {
 function randomVegetable() {
     return VEGETABLES[Math.floor(Math.random() * VEGETABLES.length)].emoji;
 }
-
-/* ----------------------------------------
-   การ์ด
----------------------------------------- */
 
 function generateCard() {
     return [randomVegetable(), randomVegetable(), randomVegetable()];
@@ -51,7 +52,7 @@ function generateCards() {
 }
 
 /* ----------------------------------------
-   LOCK UI ปุ่มการ์ด
+   LOCK UI (FIX สำคัญ)
 ---------------------------------------- */
 
 function updateCardButtonsLock() {
@@ -63,12 +64,21 @@ function updateCardButtonsLock() {
     ];
 
     buttons.forEach((btn, i) => {
+
+        if (!btn) return;
+
+        // 🟢 ถ้าเกมจบ = ล็อกหมด
+        if (gameOver) {
+            btn.disabled = true;
+            return;
+        }
+
         btn.disabled = (gameLocked || playerHasChosen || !currentCards[i]);
     });
 }
 
 /* ----------------------------------------
-   เพิ่มของผู้เล่น
+   PLAYER
 ---------------------------------------- */
 
 function addCardToPlayer(card) {
@@ -82,7 +92,7 @@ function addCardToPlayer(card) {
 }
 
 /* ----------------------------------------
-   เพิ่มของบอท
+   BOT
 ---------------------------------------- */
 
 function addCardToBot(card) {
@@ -96,7 +106,7 @@ function addCardToBot(card) {
 }
 
 /* ----------------------------------------
-   ผู้เล่นเลือก
+   PLAYER SELECT
 ---------------------------------------- */
 
 function selectCard(index) {
@@ -112,7 +122,7 @@ function selectCard(index) {
     addCardToPlayer(card);
     updateInventoryUI();
 
-  showEvent("👤 : เลือก\n" + card.join(" "));
+    showEvent("👤 : เลือก\n" + card.join(" "));
 
     currentCards[index] = null;
     playerHasChosen = true;
@@ -124,10 +134,12 @@ function selectCard(index) {
 }
 
 /* ----------------------------------------
-   บอทเลือก
+   BOT TURN (FIX กันหลุด)
 ---------------------------------------- */
 
 function botTurn() {
+
+    if (gameOver) return;
 
     const available = [];
 
@@ -151,41 +163,31 @@ function botTurn() {
     const remaining = currentCards.filter(c => c);
 
     if (remaining.length === 1) {
-
-        setTimeout(() => {
-            resolveVolatilityCard(remaining[0]);
-        }, 1700);
-
+        setTimeout(() => resolveVolatilityCard(remaining[0]), 1700);
     } else {
         endTurn();
     }
 }
 
 /* ----------------------------------------
-   ⚡ การ์ดผันผวน + ตลาด
+   VOLATILITY
 ---------------------------------------- */
 
 function resolveVolatilityCard(card) {
 
-    // 1) แสดงการ์ดผันผวน
     showEvent("⚡ การ์ดความผันผวน\n" + card.join(" "));
 
     setTimeout(() => {
 
-        // 2) อัปเดตตลาด + รับผลตลาดแตก
         const broken = applyVolatility(card);
 
         setTimeout(() => {
 
-            // 3) ถ้ามีตลาดแตก
             if (broken.length > 0) {
                 showEvent("💥 ตลาดแตก!\n" + broken.join(" "));
             }
 
-            // 4) ไปเทิร์นต่อ
-            setTimeout(() => {
-                endTurn();
-            }, 800);
+            setTimeout(() => endTurn(), 800);
 
         }, 800);
 
@@ -193,28 +195,26 @@ function resolveVolatilityCard(card) {
 }
 
 /* ----------------------------------------
-   ตลาดหุ้นเปลี่ยนจริง ตลาดแตก
+   MARKET
 ---------------------------------------- */
 
 function applyVolatility(card) {
 
-    // 📌 1. เปลี่ยนตลาด (ล้วน ๆ ไม่มีเวลา)
     card.forEach(e => {
-
         if (e === "🥦") market.broccoli++;
         if (e === "🌽") market.corn++;
         if (e === "🥕") market.carrot++;
         if (e === "🍅") market.tomato++;
         if (e === "🍆") market.eggplant++;
-
     });
 
-    // 📌 2. เช็คตลาดแตก
     const broken = [];
 
     Object.keys(market).forEach(key => {
 
-        if (market[key] >= 5) {
+    // หุ้นเต็ม 5 ยังไม่แตก
+    // ต้องโดนเพิ่มอีก 1 ก่อน
+        if (market[key] > 5) {
 
             const emojiMap = {
                 broccoli: "🥦",
@@ -225,43 +225,36 @@ function applyVolatility(card) {
             };
 
             broken.push(emojiMap[key]);
-
             market[key] = 0;
         }
     });
 
     renderMarket();
-
-    // 📌 ส่งผลลัพธ์กลับไปให้ flow คุม
     return broken;
 }
+
 /* ----------------------------------------
-   หมดเวลา
+   TIME (SAFE FIX)
 ---------------------------------------- */
 
 function updateTime() {
 
     gameHour++;
 
-if (gameHour >= 18) {
+    const hour = Math.floor(gameHour);
+    const min = (gameHour % 1) * 60;
 
-    gameHour = 18;
-    gameOver = true;
+    const display =
+        hour < 12
+            ? `${hour}:${min === 0 ? "00" : min} AM`
+            : `${hour - 12}:${min === 0 ? "00" : min} PM`;
 
-    showEvent("⛔ตลาดปิด⛔\nเทรดวันนี้จบแล้ว");
-
-    setTimeout(() => {
-
-        const playerScore = calculateScore(playerInventory);
-        const botScore = calculateScore(botInventory);
-
-        showEndGame(playerScore, botScore);
-
-    }, 3000);
+    const timeEl = document.getElementById("timeText");
+    if (timeEl) timeEl.textContent = display;
 }
 
 /* ----------------------------------------
-   นับคะแนน
+   SCORE
 ---------------------------------------- */
 
 function calculateScore(inv) {
@@ -276,31 +269,15 @@ function calculateScore(inv) {
         eggplant: 1
     };
 
-    Object.keys(inv).forEach(key => {
-        score += inv[key] * priceMap[key];
+    Object.keys(inv).forEach(k => {
+        score += inv[k] * priceMap[k];
     });
 
     return score;
 }
 
-    const display =
-        gameHour <= 12
-            ? `${gameHour}:00 AM`
-            : `${gameHour - 12}:00 PM`;
-
-    document.getElementById("timeText").textContent = display;
-}
-
 /* ----------------------------------------
-   ปุ่มรีเซ็ตเกม
----------------------------------------- */
-
-document.getElementById("restartBtn").addEventListener("click", () => {
-    location.reload();
-});
-
-/* ----------------------------------------
-   จบตา
+   END TURN (6 TURNS FIXED 100%)
 ---------------------------------------- */
 
 function endTurn() {
@@ -310,10 +287,35 @@ function endTurn() {
         playerHasChosen = false;
         gameLocked = false;
 
-        updateTime();
+        turnCount++;
 
-        // 🔥 ถ้าเกมจบ = หยุดระบบทั้งหมด
-        if (gameOver) return;
+        // 🟢 ครบ 6 ตา = จบเกม
+        if (turnCount >= 6) {
+
+            gameOver = true;
+            gameLocked = true;
+            playerHasChosen = true;
+
+            gameHour = 18.25;
+
+            updateTime();
+            updateCardButtonsLock();
+
+            showEvent("⛔ ตลาดปิด\nครบ 6 ตาแล้ว");
+
+            setTimeout(() => {
+
+                const p = calculateScore(playerInventory);
+                const b = calculateScore(botInventory);
+
+                showEndGame(p, b);
+
+            }, 2000);
+
+            return;
+        }
+
+        updateTime();
 
         generateCards();
         renderCards();
@@ -325,10 +327,12 @@ function endTurn() {
 }
 
 /* ----------------------------------------
-   เริ่มเกม
+   START GAME
 ---------------------------------------- */
 
 window.addEventListener("DOMContentLoaded", () => {
+
+    turnCount = 0;
 
     generateStartingMarket();
     renderMarket();
@@ -344,74 +348,4 @@ window.addEventListener("DOMContentLoaded", () => {
     document.getElementById("card3").onclick = () => selectCard(2);
 
     console.log("Sproutfolio Started 👑");
-});
-
-/* ----------------------------------------
-   Popup คลัง
----------------------------------------- */
-
-document.getElementById("inventoryBtn")
-.addEventListener("click", () => {
-    document.getElementById("inventoryModal").classList.remove("hidden");
-});
-
-document.getElementById("closeInventory")
-.addEventListener("click", () => {
-    document.getElementById("inventoryModal").classList.add("hidden");
-});
-
-    function showEndGame(playerScore, botScore) {
-
-    const screen = document.getElementById("endGameScreen");
-
-    const title = document.getElementById("endTitle");
-    const msg = document.getElementById("endMessage");
-
-    const pScore = document.getElementById("endPlayerScore");
-    const bScore = document.getElementById("endBotScore");
-
-    let resultText = "";
-
-    if (playerScore > botScore) {
-
-        resultText = `
-👤 คุณคือนักลงทุนที่มั่งคั่งที่สุด
-`;
-
-        title.textContent = "🎉 ยินดีด้วย 🎉";
-
-    } else if (playerScore < botScore) {
-
-        resultText = `
-🤖 ดูเหมือนว่าบอทจะมีความสามารถมากกว่าคุณ
-`;
-
-        title.textContent = "😢 แพ้แล้ว";
-
-    } else {
-
-        resultText = `
-👤🤝🤖
-ดูเหมือนว่าคุณและบอทจะต้องเป็นหุ้นส่วนกัน
-`;
-
-        title.textContent = "🤝 เสมอ";
-    }
-
-    msg.textContent = resultText;
-
-    pScore.textContent = `มูลค่าหุ้น 👤 : ${playerScore}K`;
-    bScore.textContent = `มูลค่าหุ้น 🤖 : ${botScore}K`;
-
-    screen.classList.remove("hidden");
-}
-
-document.addEventListener("DOMContentLoaded", () => {
-
-    const restartBtn = document.getElementById("restartBtn");
-
-    restartBtn.addEventListener("click", () => {
-        location.reload();
-    });
-
 });
